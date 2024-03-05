@@ -1,6 +1,8 @@
 package org.iesvdm.videoclub.service;
 
 import org.iesvdm.videoclub.domain.Categoria;
+import org.iesvdm.videoclub.domain.Pelicula;
+import org.iesvdm.videoclub.exception.PeliculaNotFoundException;
 import org.iesvdm.videoclub.repository.CategoriaRepository;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
@@ -26,5 +28,13 @@ public class CategoriaService {
     public void delete(Long id) throws ChangeSetPersister.NotFoundException {
         this.categoriaRepository.findById(id).map(categoria -> {this.categoriaRepository.delete(categoria);
         return categoria;}).orElseThrow(ChangeSetPersister.NotFoundException::new);
+    }
+
+    public Categoria replace(Long id, Categoria categoria) {
+
+        return this.categoriaRepository.findById(id).map( p -> (id.equals(categoria.getId())  ?
+                        this.categoriaRepository.save(categoria) : null))
+                .orElseThrow(() -> new PeliculaNotFoundException(id));
+
     }
 }
