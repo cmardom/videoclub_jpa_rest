@@ -8,6 +8,7 @@ import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CategoriaService {
@@ -17,7 +18,10 @@ public class CategoriaService {
         this.categoriaRepository = categoriaRepository;
     }
 
-    public List<Categoria> all() {return this.categoriaRepository.findAll();}
+    public List<Categoria> all() {
+
+        return this.categoriaRepository.findAll();
+    }
 
     public Categoria save(Categoria categoria){ return this.categoriaRepository.save(categoria);}
 
@@ -37,4 +41,19 @@ public class CategoriaService {
                 .orElseThrow(() -> new PeliculaNotFoundException(id));
 
     }
+
+    public List<Categoria> allByQueryFilterStream (Optional<String> searchingOptional, Optional <String> orderingOptional){
+        if (searchingOptional.isPresent() && orderingOptional.isPresent()){
+            if (orderingOptional.get().equals("asc")){
+                return this.categoriaRepository.findAllCategoriaOrderByNombre();
+            } else if (orderingOptional.get().equals("desc")){
+                return this.categoriaRepository.findAllCategoriaOrderByNombreReversed();
+            }
+        }
+        return this.categoriaRepository.findAll();
+
+    }
+
+
+
 }
