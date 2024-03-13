@@ -5,9 +5,15 @@ import org.iesvdm.videoclub.domain.Pelicula;
 import org.iesvdm.videoclub.exception.PeliculaNotFoundException;
 import org.iesvdm.videoclub.repository.CategoriaRepository;
 import org.springframework.data.crossstore.ChangeSetPersister;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -42,17 +48,43 @@ public class CategoriaService {
 
     }
 
-    public List<Categoria> allByQueryFilterStream (Optional<String> searchingOptional, Optional <String> orderingOptional){
-        if (searchingOptional.isPresent() && orderingOptional.isPresent()){
-            if (orderingOptional.get().equals("asc")){
-                return this.categoriaRepository.findAllCategoriaOrderByNombre();
-            } else if (orderingOptional.get().equals("desc")){
-                return this.categoriaRepository.findAllCategoriaOrderByNombreReversed();
-            }
-        }
-        return this.categoriaRepository.findAll();
+    public Map<String, Object> allPages(int page, int size){
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+        Page<Categoria> pageAll = this.categoriaRepository.findAll(pageable);
+        Map<String, Object> response = new HashMap<>();
 
+        response.put("categorias", pageAll.getContent());
+        return response;
     }
+    public Page<Categoria> allPagesByTextAsc(String buscar, int page, int size){
+        Pageable pageable = PageRequest.of(page, size, Sort.by("buscar").ascending());
+        Page<Categoria> pageAll = this.categoriaRepository.findAllByNombreOrderByNombreAsc(buscar,pageable);
+
+        return pageAll;
+    }
+
+    public Page<Categoria> allPagesByTextDesc(String buscar, int page, int size){
+        Pageable pageable = PageRequest.of(page, size, Sort.by("buscar").ascending());
+        Page<Categoria> pageAll = this.categoriaRepository.findAllByNombreOrderByNombreDesc(buscar,pageable);
+
+        return pageAll;
+    }
+
+
+
+//    public Page<Categoria> allByQueryFilterStream (Optional<String> searchingOptional, Optional <String> orderingOptional){
+//        if (searchingOptional.isPresent() && orderingOptional.isPresent()){
+//            if (orderingOptional.get().equals("asc")){
+//                return this.categoriaRepository.findAllByNombreOrderByNombreAsc(searchingOptional.toString());
+//            } else if (orderingOptional.get().equals("desc")){
+//                return this.categoriaRepository.findAllByNombreOrderByNombreDesc(searchingOptional.toString());
+//            } else {
+//                return (Page<Categoria>) this.categoriaRepository.findAll();
+//            }
+//        }
+//        return (Page<Categoria>) this.categoriaRepository.findAll();
+//
+//    }
 
 
 
